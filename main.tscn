@@ -1,0 +1,146 @@
+[gd_scene load_steps=7 format=3 uid="uid://main"]
+[ext_resource type="Script" uid="uid://b73ywba4p3mv2" path="res://main.gd" id="1_main"]
+[ext_resource type="PackedScene" uid="uid://decisionbar" path="res://scenes/decision_bar.tscn" id="2_decisionbar"]
+[ext_resource type="PackedScene" uid="uid://dvisorsidebar" path="res://scenes/advisor_sidebar.tscn" id="3_advisorsidebar"]
+[ext_resource type="PackedScene" uid="uid://scorescreen" path="res://scenes/score_screen.tscn" id="4_scorescreen"]
+[ext_resource type="Texture2D" uid="uid://copsiox5eyafs" path="res://data/stories/healer/start_screen.png" id="5_startbg"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_video_panel"]
+bg_color = Color(0, 0, 0, 1)
+
+[node name="Main" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_main")
+
+[node name="VideoPanel" type="Panel" parent="."]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_video_panel")
+
+[node name="VideoStreamPlayer" type="VideoStreamPlayer" parent="."]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+
+[node name="DecisionBackground" type="TextureRect" parent="."]
+visible = false
+z_index = 2
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 6
+
+[node name="SkipButton" type="Button" parent="."]
+visible = false
+layout_mode = 0
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -150.0
+offset_top = -78.0
+offset_right = -24.0
+offset_bottom = -24.0
+text = "Skip"
+
+[node name="AdvisorSidebar" parent="." instance=ExtResource("3_advisorsidebar")]
+visible = false
+layout_mode = 0
+anchor_left = 0.75
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 12.0
+offset_top = 24.0
+offset_right = -24.0
+offset_bottom = -24.0
+
+[node name="DecisionBar" parent="." instance=ExtResource("2_decisionbar")]
+z_index = 20
+layout_mode = 0
+anchors_preset = 0
+anchor_right = 0.0
+anchor_bottom = 0.0
+grow_horizontal = 1
+grow_vertical = 1
+
+[node name="ScoreScreen" parent="." instance=ExtResource("4_scorescreen")]
+anchors_preset = 0
+
+[node name="StartOverlay" type="Control" parent="."]
+z_index = 100
+anchors_preset = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="StartBackground" type="TextureRect" parent="StartOverlay"]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+texture = ExtResource("5_startbg")
+expand_mode = 1
+stretch_mode = 6
+
+[node name="StartTint" type="ColorRect" parent="StartOverlay"]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0, 0, 0, 0.2)
+
+[node name="StartLabel" type="Label" parent="StartOverlay"]
+layout_mode = 0
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -500.0
+offset_top = -110.0
+offset_right = 500.0
+offset_bottom = 110.0
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.9)
+theme_override_constants/shadow_offset_x = 3
+theme_override_constants/shadow_offset_y = 3
+theme_override_font_sizes/font_size = 60
+text = "CLICK TO START"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="DebugPlaceholder" type="ColorRect" parent="."]
+visible = false
+z_index = 1
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+color = Color(0.15, 0.25, 0.45, 1)
+
+[node name="DebugLabel" type="Label" parent="DebugPlaceholder"]
+layout_mode = 0
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -220.0
+offset_top = -30.0
+offset_right = 220.0
+offset_bottom = 30.0
+theme_override_font_sizes/font_size = 32
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="DebugTimer" type="Timer" parent="."]
+one_shot = true
+
+[node name="ReplayTimer" type="Timer" parent="."]
+wait_time = 10.0
+one_shot = true
