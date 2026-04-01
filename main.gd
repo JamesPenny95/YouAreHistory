@@ -15,6 +15,7 @@ extends Control
 @onready var advisor_sidebar = $AdvisorSidebar
 @onready var score_screen = $ScoreScreen
 @onready var start_overlay: Control = $StartOverlay
+@onready var pause_overlay: Control = $PauseOverlay
 @onready var debug_placeholder: ColorRect = $DebugPlaceholder
 @onready var debug_label: Label = $DebugPlaceholder/DebugLabel
 @onready var debug_timer: Timer = $DebugTimer
@@ -22,7 +23,7 @@ extends Control
 
 const DEBUG_TIMEOUT := 5.0
 const VIDEO_ASPECT := 16.0 / 9.0
-const PAUSE_ON_UNFOCUS := false
+const PAUSE_ON_UNFOCUS := true
 
 var _resume_video_on_focus: bool = false
 var _resume_debug_timer_on_focus: bool = false
@@ -30,6 +31,7 @@ var _resume_tree_on_focus: bool = false
 var _last_focus_state: bool = true
 var _story_started: bool = false
 var _awaiting_start_click: bool = true
+var _awaiting_resume_click: bool = false
 var _on_final_screen: bool = false
 
 
@@ -62,6 +64,7 @@ func _ready() -> void:
 	advisor_sidebar.visible = false
 	score_screen.visible = false
 	start_overlay.visible = true
+	pause_overlay.visible = false
 	debug_placeholder.visible = false
 	decision_background.visible = false
 	decision_bar.set_idle()
@@ -102,6 +105,9 @@ func _process(_delta: float) -> void:
 
 func _input(event: InputEvent) -> void:
 	if event is InputEventMouseButton and event.pressed:
+		if _awaiting_resume_click:
+			_resume_from_pause_overlay()
+			return
 		if _awaiting_start_click:
 			_begin_story_from_start_screen()
 			return
@@ -110,6 +116,9 @@ func _input(event: InputEvent) -> void:
 			return
 
 	if event is InputEventKey and event.pressed and not event.echo:
+		if _awaiting_resume_click:
+			_resume_from_pause_overlay()
+			return
 		if _awaiting_start_click:
 			_begin_story_from_start_screen()
 			return
@@ -120,10 +129,12 @@ func _input(event: InputEvent) -> void:
 
 func _begin_story_from_start_screen() -> void:
 	_awaiting_start_click = false
+	_awaiting_resume_click = false
 	_on_final_screen = false
 	_story_started = true
 	replay_timer.stop()
 	start_overlay.visible = false
+	pause_overlay.visible = false
 	score_screen.visible = false
 	score_screen.update_countdown(0.0, replay_timer.wait_time)
 	StoryController.load_story("healer")
@@ -133,6 +144,7 @@ func _return_to_start_screen() -> void:
 	replay_timer.stop()
 	_on_final_screen = false
 	_awaiting_start_click = true
+	_awaiting_resume_click = false
 	_story_started = false
 
 	video_player.stop()
@@ -145,7 +157,26 @@ func _return_to_start_screen() -> void:
 	advisor_sidebar.set_idle()
 	score_screen.visible = false
 	score_screen.update_countdown(0.0, replay_timer.wait_time)
+	pause_overlay.visible = false
 	start_overlay.visible = true
+
+
+func _resume_from_pause_overlay() -> void:
+	_awaiting_resume_click = false
+	pause_overlay.visible = false
+
+	if get_tree() != null and _resume_tree_on_focus:
+		get_tree().paused = false
+
+	if video_player != null and _resume_video_on_focus:
+		video_player.paused = false
+
+	if debug_timer != null and _resume_debug_timer_on_focus:
+		debug_timer.paused = false
+
+	_resume_video_on_focus = false
+	_resume_debug_timer_on_focus = false
+	_resume_tree_on_focus = false
 
 
 func _is_app_focused() -> bool:
@@ -164,6 +195,10 @@ func _is_app_focused() -> bool:
 
 func _on_app_focus_out() -> void:
 	if not PAUSE_ON_UNFOCUS:
+		return
+	if _awaiting_start_click or _on_final_screen or not _story_started:
+		return
+	if _awaiting_resume_click:
 		return
 
 	_resume_video_on_focus = false
@@ -187,18 +222,9 @@ func _on_app_focus_in() -> void:
 	if not PAUSE_ON_UNFOCUS:
 		return
 
-	if get_tree() != null and _resume_tree_on_focus:
-		get_tree().paused = false
-
-	if video_player != null and _resume_video_on_focus:
-		video_player.paused = false
-
-	if debug_timer != null and _resume_debug_timer_on_focus:
-		debug_timer.paused = false
-
-	_resume_video_on_focus = false
-	_resume_debug_timer_on_focus = false
-	_resume_tree_on_focus = false
+	if _resume_tree_on_focus:
+		_awaiting_resume_click = true
+		pause_overlay.visible = true
 
 
 func _layout_overlays() -> void:
@@ -222,6 +248,13 @@ func _layout_overlays() -> void:
 		start_overlay.offset_top = 0.0
 		start_overlay.offset_right = 0.0
 		start_overlay.offset_bottom = 0.0
+
+	if pause_overlay != null:
+		pause_overlay.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+		pause_overlay.offset_left = 0.0
+		pause_overlay.offset_top = 0.0
+		pause_overlay.offset_right = 0.0
+		pause_overlay.offset_bottom = 0.0
 
 
 func _layout_video_area() -> void:
