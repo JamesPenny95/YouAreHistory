@@ -2,35 +2,6 @@
   "title": "The Mediaeval Healer (Revised)",
   "period": "Mediaeval England, c. 1350",
   "character": "A village healer woman",
-  "advisors": [
-    {
-      "name": "TODO",
-      "role": "TODO",
-      "avatar": "res://data/stories/healer/advisor_1.png",
-      "responses": {
-        "decision_1": "TODO — advisor 1 response for decision 1",
-        "decision_2": "TODO — advisor 1 response for decision 2"
-      }
-    },
-    {
-      "name": "TODO",
-      "role": "TODO",
-      "avatar": "res://data/stories/healer/advisor_2.png",
-      "responses": {
-        "decision_1": "TODO — advisor 2 response for decision 1",
-        "decision_2": "TODO — advisor 2 response for decision 2"
-      }
-    },
-    {
-      "name": "TODO",
-      "role": "TODO",
-      "avatar": "res://data/stories/healer/advisor_3.png",
-      "responses": {
-        "decision_1": "TODO — advisor 3 response for decision 1",
-        "decision_2": "TODO — advisor 3 response for decision 2"
-      }
-    }
-  ],
   "states": [
     {
       "id": "intro",
