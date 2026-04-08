@@ -195,7 +195,3 @@ Problem: black bars differ between clips
 4. Add final videos and check VLC metadata
 5. Run in engine and exported HTML5 build
 6. Fix framing first, then polish text/images
-
----
-
-If you want, this guide can be followed by a one-page "story.json validator" checklist for producers (non-technical) before handing assets to dev.
