@@ -4,7 +4,7 @@
 [ext_resource type="PackedScene" uid="uid://decisionbar" path="res://scenes/decision_bar.tscn" id="2_decisionbar"]
 [ext_resource type="PackedScene" uid="uid://dvisorsidebar" path="res://scenes/advisor_sidebar.tscn" id="3_advisorsidebar"]
 [ext_resource type="PackedScene" uid="uid://scorescreen" path="res://scenes/score_screen.tscn" id="4_scorescreen"]
-[ext_resource type="Texture2D" uid="uid://copsiox5eyafs" path="res://data/stories/healer/start_screen.png" id="5_startbg"]
+[ext_resource type="Texture2D" path="res://data/stories/healer/start_screen.png" id="5_startbg"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_video_panel"]
 bg_color = Color(0, 0, 0, 1)

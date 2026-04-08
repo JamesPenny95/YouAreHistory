@@ -75,7 +75,7 @@ func _ready() -> void:
 
 	advisor_sidebar.visible = false
 	score_screen.visible = false
-	start_overlay.visible = false
+	start_overlay.visible = true
 	menu_panel.visible = true
 	press_to_start_label.visible = false
 	pause_overlay.visible = false
@@ -88,12 +88,12 @@ func _ready() -> void:
 	_last_focus_state = _is_app_focused()
 	_layout_overlays()
 	_layout_video_area()
-	
-	# Load healer_2 directly on startup
+
+	# Preselect healer_2 and wait for explicit press-to-start input.
 	_selected_story_id = "healer_2"
-	_awaiting_start_click = false
-	_story_started = true
-	StoryController.load_story("healer_2")
+	_awaiting_start_click = true
+	_story_started = false
+	_show_press_to_start_mode()
 
 
 func _notification(what: int) -> void:
@@ -391,7 +391,7 @@ func _layout_overlays() -> void:
 
 
 func _layout_video_area() -> void:
-	if video_player == null or debug_placeholder == null:
+	if video_player == null or debug_placeholder == null or decision_background == null:
 		return
 
 	var viewport_size: Vector2 = size
@@ -412,6 +412,10 @@ func _layout_video_area() -> void:
 	debug_placeholder.set_anchors_and_offsets_preset(Control.PRESET_TOP_LEFT)
 	debug_placeholder.position = pos
 	debug_placeholder.size = target_size
+
+	decision_background.set_anchors_and_offsets_preset(Control.PRESET_TOP_LEFT)
+	decision_background.position = pos
+	decision_background.size = target_size
 
 
 func _on_state_changed(state: Dictionary) -> void:
