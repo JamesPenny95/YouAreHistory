@@ -14,8 +14,8 @@ script = ExtResource("1_db")
 [node name="PromptMargin" type="MarginContainer" parent="."]
 layout_mode = 0
 anchor_right = 1.0
-offset_top = 24.0
-offset_bottom = 124.0
+offset_top = 16.0
+offset_bottom = 120.0
 theme_override_constants/margin_left = 28
 theme_override_constants/margin_right = 28
 
@@ -25,7 +25,7 @@ size_flags_horizontal = 3
 horizontal_alignment = 1
 vertical_alignment = 1
 autowrap_mode = 3
-theme_override_font_sizes/font_size = 34
+theme_override_font_sizes/font_size = 40
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.9)
 theme_override_constants/shadow_offset_x = 2
@@ -38,9 +38,9 @@ anchor_top = 0.5
 anchor_right = 0.25
 anchor_bottom = 0.5
 offset_left = -292.0
-offset_top = -292.0
+offset_top = -280.0
 offset_right = 292.0
-offset_bottom = 292.0
+offset_bottom = 304.0
 ignore_texture_size = true
 stretch_mode = 5
 
@@ -61,6 +61,20 @@ theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.9)
 theme_override_constants/shadow_offset_x = 2
 theme_override_constants/shadow_offset_y = 2
 
+[node name="LabelImageA" type="TextureRect" parent="."]
+layout_mode = 0
+anchor_left = 0.25
+anchor_top = 0.5
+anchor_right = 0.25
+anchor_bottom = 0.5
+offset_left = -240.0
+offset_top = 312.0
+offset_right = 240.0
+offset_bottom = 358.0
+expand_mode = 1
+stretch_mode = 3
+visible = false
+
 [node name="ButtonB" type="TextureButton" parent="."]
 layout_mode = 0
 anchor_left = 0.75
@@ -68,9 +82,9 @@ anchor_top = 0.5
 anchor_right = 0.75
 anchor_bottom = 0.5
 offset_left = -292.0
-offset_top = -292.0
+offset_top = -280.0
 offset_right = 292.0
-offset_bottom = 292.0
+offset_bottom = 304.0
 ignore_texture_size = true
 stretch_mode = 5
 
@@ -90,3 +104,17 @@ theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.9)
 theme_override_constants/shadow_offset_x = 2
 theme_override_constants/shadow_offset_y = 2
+
+[node name="LabelImageB" type="TextureRect" parent="."]
+layout_mode = 0
+anchor_left = 0.75
+anchor_top = 0.5
+anchor_right = 0.75
+anchor_bottom = 0.5
+offset_left = -240.0
+offset_top = 312.0
+offset_right = 240.0
+offset_bottom = 358.0
+expand_mode = 1
+stretch_mode = 3
+visible = false

@@ -58,6 +58,13 @@ func load_story(story_id: String) -> void:
 		if _states_by_id.has(id):
 			push_error("StoryController: duplicate state id '%s'" % id)
 			return
+		var state_type := String(state.get("type", "")).to_upper()
+		if state_type in ["DECISION", "FINAL"]:
+			var has_background: bool = String(state.get("background", "")) != ""
+			var has_video: bool = String(state.get("video", "")) != ""
+			if has_background and has_video:
+				push_error("StoryController: %s state '%s' cannot define both 'background' and 'video'" % [state_type, id])
+				return
 		_states_by_id[id] = state
 
 	_advisors = parsed.get("advisors", [])
@@ -129,11 +136,6 @@ func _enter_state(id: String) -> void:
 	emit_signal("state_changed", state)
 
 	match _type_of(state):
-		StateType.LOOP:
-			# The loop video plays while the player decides. Immediately advance
-			# to the DECISION state so the decision bar becomes visible.
-			# _on_state_changed in main.gd preserves the looping video for DECISION.
-			_advance_to(state.get("next_state", ""))
 		StateType.DECISION:
 			_last_decision_id = id
 			emit_signal("decision_required", state.get("prompt", ""), state.get("options", []), _advisors)

@@ -15,6 +15,13 @@ extends Control
 @onready var advisor_sidebar = $AdvisorSidebar
 @onready var score_screen = $ScoreScreen
 @onready var start_overlay: Control = $StartOverlay
+@onready var menu_panel: PanelContainer = $StartOverlay/MenuPanel
+@onready var press_to_start_label: Label = $StartOverlay/PressToStartLabel
+@onready var story_list: ItemList = $StartOverlay/MenuPanel/Margin/MenuVBox/Content/StoryList
+@onready var selected_title: Label = $StartOverlay/MenuPanel/Margin/MenuVBox/Content/MetaPanel/MetaMargin/MetaVBox/SelectedTitle
+@onready var selected_period: Label = $StartOverlay/MenuPanel/Margin/MenuVBox/Content/MetaPanel/MetaMargin/MetaVBox/SelectedPeriod
+@onready var selected_character: Label = $StartOverlay/MenuPanel/Margin/MenuVBox/Content/MetaPanel/MetaMargin/MetaVBox/SelectedCharacter
+@onready var play_button: Button = $StartOverlay/MenuPanel/Margin/MenuVBox/PlayButton
 @onready var pause_overlay: Control = $PauseOverlay
 @onready var debug_placeholder: ColorRect = $DebugPlaceholder
 @onready var debug_label: Label = $DebugPlaceholder/DebugLabel
@@ -33,9 +40,12 @@ var _story_started: bool = false
 var _awaiting_start_click: bool = true
 var _awaiting_resume_click: bool = false
 var _on_final_screen: bool = false
+var _available_stories: Array = []
+var _selected_story_id: String = ""
+var _start_overlay_press_mode: bool = false
 
 
-func _set_decision_background(image_path: String) -> bool:
+func _set_state_background(image_path: String) -> bool:
 	if image_path == "":
 		decision_background.texture = null
 		decision_background.visible = false
@@ -60,10 +70,14 @@ func _ready() -> void:
 	debug_timer.timeout.connect(StoryController.on_video_finished)
 	replay_timer.timeout.connect(_return_to_start_screen)
 	skip_button.pressed.connect(_on_skip_pressed)
+	story_list.item_selected.connect(_on_story_selected)
+	play_button.pressed.connect(_on_play_pressed)
 
 	advisor_sidebar.visible = false
 	score_screen.visible = false
-	start_overlay.visible = true
+	start_overlay.visible = false
+	menu_panel.visible = true
+	press_to_start_label.visible = false
 	pause_overlay.visible = false
 	debug_placeholder.visible = false
 	decision_background.visible = false
@@ -74,6 +88,12 @@ func _ready() -> void:
 	_last_focus_state = _is_app_focused()
 	_layout_overlays()
 	_layout_video_area()
+	
+	# Load healer_2 directly on startup
+	_selected_story_id = "healer_2"
+	_awaiting_start_click = false
+	_story_started = true
+	StoryController.load_story("healer_2")
 
 
 func _notification(what: int) -> void:
@@ -108,7 +128,7 @@ func _input(event: InputEvent) -> void:
 		if _awaiting_resume_click:
 			_resume_from_pause_overlay()
 			return
-		if _awaiting_start_click:
+		if _awaiting_start_click and _start_overlay_press_mode:
 			_begin_story_from_start_screen()
 			return
 		if _on_final_screen:
@@ -119,7 +139,7 @@ func _input(event: InputEvent) -> void:
 		if _awaiting_resume_click:
 			_resume_from_pause_overlay()
 			return
-		if _awaiting_start_click:
+		if _awaiting_start_click and _start_overlay_press_mode:
 			_begin_story_from_start_screen()
 			return
 		if _on_final_screen:
@@ -128,16 +148,22 @@ func _input(event: InputEvent) -> void:
 
 
 func _begin_story_from_start_screen() -> void:
+	if _selected_story_id == "":
+		return
+
 	_awaiting_start_click = false
 	_awaiting_resume_click = false
 	_on_final_screen = false
 	_story_started = true
 	replay_timer.stop()
 	start_overlay.visible = false
+	_start_overlay_press_mode = false
+	menu_panel.visible = true
+	press_to_start_label.visible = false
 	pause_overlay.visible = false
 	score_screen.visible = false
 	score_screen.update_countdown(0.0, replay_timer.wait_time)
-	StoryController.load_story("healer")
+	StoryController.load_story(_selected_story_id)
 
 
 func _return_to_start_screen() -> void:
@@ -159,6 +185,113 @@ func _return_to_start_screen() -> void:
 	score_screen.update_countdown(0.0, replay_timer.wait_time)
 	pause_overlay.visible = false
 	start_overlay.visible = true
+	if _selected_story_id == "":
+		_load_story_menu()
+		_show_story_menu_mode()
+	else:
+		_show_press_to_start_mode()
+
+
+func _load_story_menu() -> void:
+	_available_stories = []
+	if _selected_story_id != "":
+		# Preserve selected story across reset cycles for museum operation.
+		pass
+	else:
+		_selected_story_id = ""
+	story_list.clear()
+
+	var stories_dir := DirAccess.open("res://data/stories")
+	if stories_dir == null:
+		selected_title.text = "No stories found"
+		selected_period.text = ""
+		selected_character.text = ""
+		play_button.disabled = true
+		return
+
+	stories_dir.list_dir_begin()
+	var entry := stories_dir.get_next()
+	while entry != "":
+		if stories_dir.current_is_dir() and not entry.begins_with("."):
+			var json_path := "res://data/stories/%s/story.json" % entry
+			if FileAccess.file_exists(json_path):
+				var file := FileAccess.open(json_path, FileAccess.READ)
+				if file != null:
+					var parsed = JSON.parse_string(file.get_as_text())
+					file.close()
+					if parsed is Dictionary:
+						_available_stories.append({
+							"id": entry,
+							"title": parsed.get("title", entry),
+							"period": parsed.get("period", ""),
+							"character": parsed.get("character", "")
+						})
+		entry = stories_dir.get_next()
+	stories_dir.list_dir_end()
+
+	_available_stories.sort_custom(func(a: Dictionary, b: Dictionary) -> bool:
+		return String(a.get("title", "")).nocasecmp_to(String(b.get("title", ""))) < 0
+	)
+
+	for story in _available_stories:
+		var title: String = story.get("title", "")
+		var period: String = story.get("period", "")
+		var character: String = story.get("character", "")
+		var parts: Array[String] = []
+		if title != "":
+			parts.append(title)
+		if period != "":
+			parts.append(period)
+		if character != "":
+			parts.append(character)
+		story_list.add_item(", ".join(parts) if not parts.is_empty() else "Untitled story")
+
+	if _available_stories.is_empty():
+		selected_title.text = "No stories found"
+		selected_period.text = ""
+		selected_character.text = ""
+		play_button.disabled = true
+		return
+
+	var preselected := -1
+	for i in _available_stories.size():
+		if _available_stories[i].get("id", "") == _selected_story_id:
+			preselected = i
+			break
+	if preselected == -1:
+		preselected = 0
+
+	story_list.select(preselected)
+	_on_story_selected(preselected)
+
+
+func _on_story_selected(index: int) -> void:
+	if index < 0 or index >= _available_stories.size():
+		return
+
+	var story: Dictionary = _available_stories[index]
+	_selected_story_id = story.get("id", "")
+	selected_title.text = story.get("title", "")
+	selected_period.text = "Period: %s" % story.get("period", "Unknown")
+	selected_character.text = "Character: %s" % story.get("character", "Unknown")
+	play_button.disabled = (_selected_story_id == "")
+
+
+func _on_play_pressed() -> void:
+	if _awaiting_start_click:
+		_begin_story_from_start_screen()
+
+
+func _show_story_menu_mode() -> void:
+	_start_overlay_press_mode = false
+	menu_panel.visible = true
+	press_to_start_label.visible = false
+
+
+func _show_press_to_start_mode() -> void:
+	_start_overlay_press_mode = true
+	menu_panel.visible = false
+	press_to_start_label.visible = true
 
 
 func _resume_from_pause_overlay() -> void:
@@ -283,7 +416,7 @@ func _layout_video_area() -> void:
 
 func _on_state_changed(state: Dictionary) -> void:
 	var type_str: String = state.get("type", "").to_upper()
-	var preserve_media: bool = (type_str == "DECISION")
+	var preserve_media: bool = false
 
 	# Stop and hide video if not preserving it for this state.
 	if not preserve_media:
@@ -294,11 +427,12 @@ func _on_state_changed(state: Dictionary) -> void:
 		video_player.stop()
 		video_player.visible = false
 		debug_placeholder.visible = false
-		_set_decision_background("")
+		_set_state_background("")
 		debug_timer.stop()
 
 	advisor_sidebar.visible = false
 	score_screen.visible = (type_str == "FINAL")
+	score_screen.set_media_overlay_mode(false)
 	_on_final_screen = (type_str == "FINAL")
 
 	if type_str != "DECISION":
@@ -307,19 +441,18 @@ func _on_state_changed(state: Dictionary) -> void:
 
 	skip_button.visible = (type_str == "SCENE")
 
-	if type_str in ["SCENE", "LOOP", "CONSEQUENCE"]:
-		if type_str == "LOOP":
+	if type_str in ["SCENE", "CONSEQUENCE", "DECISION", "FINAL"]:
+		if type_str in ["DECISION", "FINAL"]:
 			var background_file: String = state.get("background", "")
-			if _set_decision_background(background_file):
+			if _set_state_background(background_file):
+				if type_str == "FINAL":
+					score_screen.set_media_overlay_mode(true)
 				video_player.stop()
 				video_player.visible = false
 				debug_placeholder.visible = false
 				return
 
-			video_player.stop()
-			video_player.visible = false
-			debug_placeholder.visible = false
-			_set_decision_background("")
+			_set_state_background("")
 
 		var video_file: String = state.get("video", "")
 		var stream: VideoStream = null
@@ -328,23 +461,24 @@ func _on_state_changed(state: Dictionary) -> void:
 				stream = load(video_file) as VideoStream
 
 		if stream:
-			_set_decision_background("")
+			_set_state_background("")
+			if type_str == "FINAL":
+				score_screen.set_media_overlay_mode(true)
 			video_player.stop()
 			video_player.visible = true
 			video_player.stream = stream
-			video_player.loop = (type_str == "LOOP")
+			video_player.loop = (type_str == "DECISION")
 			video_player.play()
 		else:
-			_set_decision_background("")
+			_set_state_background("")
+			if type_str == "FINAL":
+				score_screen.set_media_overlay_mode(false)
 			# --- Debug fallback ---
 			_show_debug_placeholder(state)
-			if type_str != "LOOP":
+			if type_str != "DECISION":
 				debug_timer.start()
-			# LOOP states wait indefinitely; the decision bar drives the advance.
+			# DECISION states wait indefinitely; the decision bar drives the advance.
 
-	elif type_str == "DECISION":
-		decision_background.visible = (decision_background.texture != null)
-		pass  # Keep the decision background visible while choices are shown.
 	elif type_str != "FINAL":
 		video_player.visible = false
 
@@ -355,7 +489,7 @@ func _show_debug_placeholder(state: Dictionary) -> void:
 	# Tint by state type so it is easy to tell states apart at a glance.
 	match state.get("type", "").to_upper():
 		"SCENE":       debug_placeholder.color = Color(0.15, 0.25, 0.45)
-		"LOOP":        debug_placeholder.color = Color(0.20, 0.40, 0.20)
+		"DECISION":    debug_placeholder.color = Color(0.20, 0.40, 0.20)
 		"CONSEQUENCE": debug_placeholder.color = Color(0.45, 0.20, 0.15)
 		_:             debug_placeholder.color = Color(0.30, 0.30, 0.30)
 

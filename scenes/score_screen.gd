@@ -6,9 +6,17 @@ extends Control
 @onready var score_label: Label = $ScoreLabel
 @onready var countdown_label: Label = $CountdownLabel
 @onready var countdown_ring = $CountdownRing
+@onready var background: TextureRect = $Background
+@onready var tint: ColorRect = $Tint
 
 var _countdown_remaining: float = 0.0
 var _countdown_total: float = 10.0
+
+
+func set_media_overlay_mode(enabled: bool) -> void:
+	# True = hide score screen backdrop so scene media stays visible behind text.
+	background.visible = not enabled
+	tint.visible = not enabled
 
 
 func show_score(score: int, total: int) -> void:

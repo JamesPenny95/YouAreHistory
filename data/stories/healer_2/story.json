@@ -1,0 +1,72 @@
+{
+  "title": "The Mediaeval Healer (Revised)",
+  "period": "Mediaeval England, c. 1350",
+  "character": "A village healer woman",
+  "advisors": [
+    {
+      "name": "TODO",
+      "role": "TODO",
+      "avatar": "res://data/stories/healer/advisor_1.png",
+      "responses": {
+        "decision_1": "TODO — advisor 1 response for decision 1",
+        "decision_2": "TODO — advisor 1 response for decision 2"
+      }
+    },
+    {
+      "name": "TODO",
+      "role": "TODO",
+      "avatar": "res://data/stories/healer/advisor_2.png",
+      "responses": {
+        "decision_1": "TODO — advisor 2 response for decision 1",
+        "decision_2": "TODO — advisor 2 response for decision 2"
+      }
+    },
+    {
+      "name": "TODO",
+      "role": "TODO",
+      "avatar": "res://data/stories/healer/advisor_3.png",
+      "responses": {
+        "decision_1": "TODO — advisor 3 response for decision 1",
+        "decision_2": "TODO — advisor 3 response for decision 2"
+      }
+    }
+  ],
+  "states": [
+    {
+      "id": "intro",
+      "type": "SCENE",
+      "video": "res://data/stories/healer_2/healer_intro.ogv",
+      "next_state": "decision_1"
+    },
+    {
+      "id": "decision_1",
+      "type": "DECISION",
+      "background": "res://data/stories/healer_2/decision_background.png",
+      "prompt": "Which remedy should the healer use?",
+      "options": [
+        { "label": "Garlic?", "label_image": "res://data/stories/healer_2/Garlic_Text.png", "prompt": "Garlic", "image": "res://data/stories/healer_2/Garlic.png" },
+        { "label": "Red Hot Ladle?", "label_image": "res://data/stories/healer_2/Ladle_Text.png", "prompt": "Red Hot Ladle", "image": "res://data/stories/healer_2/Ladle.png" }
+      ],
+      "correct_option": 0,
+      "consequence_state": "decision_1_wrong",
+      "next_state": "decision_1_correct"
+    },
+    {
+      "id": "decision_1_wrong",
+      "type": "CONSEQUENCE",
+      "video": "res://data/stories/healer_2/healer_decision_1_wrong.ogv",
+      "rewind_to": "decision_1"
+    },
+    {
+      "id": "decision_1_correct",
+      "type": "SCENE",
+      "video": "res://data/stories/healer_2/healer_decision_1_correct.ogv",
+      "next_state": "final"
+    },
+    {
+      "id": "final",
+      "type": "FINAL",
+      "background": "res://data/stories/healer_2/end_screen.png"
+    }
+  ]
+}
