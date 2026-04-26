@@ -1,0 +1,42 @@
+[gd_scene load_steps=3 format=3 uid="uid://advisorsidebar"]
+
+[ext_resource type="Script" path="res://scenes/advisor_sidebar.gd" id="1_as"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_sidebar_panel"]
+bg_color = Color(0.169, 0.106, 0.122, 0.94)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.808, 0.431, 0.337, 1)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+
+[node name="AdvisorSidebar" type="PanelContainer"]
+theme_override_styles/panel = SubResource("StyleBoxFlat_sidebar_panel")
+script = ExtResource("1_as")
+
+[node name="Margin" type="MarginContainer" parent="."]
+theme_override_constants/margin_left = 18
+theme_override_constants/margin_top = 18
+theme_override_constants/margin_right = 18
+theme_override_constants/margin_bottom = 18
+
+[node name="VBox" type="VBoxContainer" parent="Margin"]
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 14
+
+[node name="AdvisorList" type="VBoxContainer" parent="Margin/VBox"]
+size_flags_horizontal = 3
+
+[node name="ResponseScroll" type="ScrollContainer" parent="Margin/VBox"]
+size_flags_vertical = 3
+size_flags_horizontal = 3
+
+[node name="ResponseLabel" type="Label" parent="Margin/VBox/ResponseScroll"]
+size_flags_horizontal = 3
+autowrap_mode = 3
+vertical_alignment = 0

@@ -1,0 +1,257 @@
+[gd_scene load_steps=7 format=3 uid="uid://main"]
+
+[ext_resource type="Script" uid="uid://b73ywba4p3mv2" path="res://main.gd" id="1_main"]
+[ext_resource type="PackedScene" uid="uid://decisionbar" path="res://scenes/decision_bar.tscn" id="2_decisionbar"]
+[ext_resource type="PackedScene" uid="uid://dvisorsidebar" path="res://scenes/advisor_sidebar.tscn" id="3_advisorsidebar"]
+[ext_resource type="PackedScene" uid="uid://scorescreen" path="res://scenes/score_screen.tscn" id="4_scorescreen"]
+[ext_resource type="Texture2D" path="res://data/stories/healer/start_screen.png" id="5_startbg"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_video_panel"]
+bg_color = Color(0, 0, 0, 1)
+
+[node name="Main" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_main")
+
+[node name="VideoPanel" type="Panel" parent="."]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_video_panel")
+
+[node name="VideoStreamPlayer" type="VideoStreamPlayer" parent="."]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+
+[node name="DecisionBackground" type="TextureRect" parent="."]
+visible = false
+z_index = 2
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 6
+
+[node name="SkipButton" type="Button" parent="."]
+visible = false
+layout_mode = 0
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -150.0
+offset_top = -78.0
+offset_right = -24.0
+offset_bottom = -24.0
+text = "Skip"
+
+[node name="AdvisorSidebar" parent="." instance=ExtResource("3_advisorsidebar")]
+visible = false
+layout_mode = 0
+anchor_left = 0.75
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 12.0
+offset_top = 24.0
+offset_right = -24.0
+offset_bottom = -24.0
+
+[node name="DecisionBar" parent="." instance=ExtResource("2_decisionbar")]
+z_index = 20
+layout_mode = 0
+anchors_preset = 0
+anchor_right = 0.0
+anchor_bottom = 0.0
+grow_horizontal = 1
+grow_vertical = 1
+
+[node name="ScoreScreen" parent="." instance=ExtResource("4_scorescreen")]
+anchors_preset = 0
+
+[node name="StartOverlay" type="Control" parent="."]
+z_index = 100
+anchors_preset = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="StartBackground" type="TextureRect" parent="StartOverlay"]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+texture = ExtResource("5_startbg")
+expand_mode = 1
+stretch_mode = 6
+
+[node name="StartTint" type="ColorRect" parent="StartOverlay"]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0, 0, 0, 0.2)
+
+[node name="MenuPanel" type="PanelContainer" parent="StartOverlay"]
+layout_mode = 0
+anchor_left = 0.15
+anchor_top = 0.15
+anchor_right = 0.85
+anchor_bottom = 0.85
+
+[node name="Margin" type="MarginContainer" parent="StartOverlay/MenuPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 24
+theme_override_constants/margin_top = 24
+theme_override_constants/margin_right = 24
+theme_override_constants/margin_bottom = 24
+
+[node name="MenuVBox" type="VBoxContainer" parent="StartOverlay/MenuPanel/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="MenuTitle" type="Label" parent="StartOverlay/MenuPanel/Margin/MenuVBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.85)
+theme_override_constants/shadow_offset_x = 2
+theme_override_constants/shadow_offset_y = 2
+theme_override_font_sizes/font_size = 48
+text = "YOU ARE HISTORY"
+horizontal_alignment = 1
+
+[node name="Content" type="HBoxContainer" parent="StartOverlay/MenuPanel/Margin/MenuVBox"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 20
+
+[node name="StoryList" type="ItemList" parent="StartOverlay/MenuPanel/Margin/MenuVBox/Content"]
+custom_minimum_size = Vector2(420, 420)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="MetaPanel" type="PanelContainer" parent="StartOverlay/MenuPanel/Margin/MenuVBox/Content"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="MetaMargin" type="MarginContainer" parent="StartOverlay/MenuPanel/Margin/MenuVBox/Content/MetaPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 16
+
+[node name="MetaVBox" type="VBoxContainer" parent="StartOverlay/MenuPanel/Margin/MenuVBox/Content/MetaPanel/MetaMargin"]
+layout_mode = 2
+theme_override_constants/separation = 14
+
+[node name="SelectedTitle" type="Label" parent="StartOverlay/MenuPanel/Margin/MenuVBox/Content/MetaPanel/MetaMargin/MetaVBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 34
+text = "Select a story"
+autowrap_mode = 3
+
+[node name="SelectedPeriod" type="Label" parent="StartOverlay/MenuPanel/Margin/MenuVBox/Content/MetaPanel/MetaMargin/MetaVBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 26
+autowrap_mode = 3
+
+[node name="SelectedCharacter" type="Label" parent="StartOverlay/MenuPanel/Margin/MenuVBox/Content/MetaPanel/MetaMargin/MetaVBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 26
+autowrap_mode = 3
+
+[node name="PlayButton" type="Button" parent="StartOverlay/MenuPanel/Margin/MenuVBox"]
+custom_minimum_size = Vector2(0, 66)
+layout_mode = 2
+theme_override_font_sizes/font_size = 32
+text = "Play"
+
+[node name="PressToStartLabel" type="Label" parent="StartOverlay"]
+visible = false
+layout_mode = 0
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -560.0
+offset_top = -80.0
+offset_right = 560.0
+offset_bottom = 80.0
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.9)
+theme_override_constants/shadow_offset_x = 3
+theme_override_constants/shadow_offset_y = 3
+theme_override_font_sizes/font_size = 56
+text = "PRESS HERE TO START"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="PauseOverlay" type="Control" parent="."]
+visible = false
+z_index = 95
+anchors_preset = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="PauseTint" type="ColorRect" parent="PauseOverlay"]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0, 0, 0, 0.3)
+
+[node name="PauseLabel" type="Label" parent="PauseOverlay"]
+layout_mode = 0
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -520.0
+offset_top = -84.0
+offset_right = 520.0
+offset_bottom = 84.0
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.9)
+theme_override_constants/shadow_offset_x = 3
+theme_override_constants/shadow_offset_y = 3
+theme_override_font_sizes/font_size = 52
+text = "CLICK TO CONTINUE"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="DebugPlaceholder" type="ColorRect" parent="."]
+visible = false
+z_index = 1
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+color = Color(0.15, 0.25, 0.45, 1)
+
+[node name="DebugLabel" type="Label" parent="DebugPlaceholder"]
+layout_mode = 0
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -220.0
+offset_top = -30.0
+offset_right = 220.0
+offset_bottom = 30.0
+theme_override_font_sizes/font_size = 32
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="DebugTimer" type="Timer" parent="."]
+one_shot = true
+
+[node name="ReplayTimer" type="Timer" parent="."]
+wait_time = 10.0
+one_shot = true

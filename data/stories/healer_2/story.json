@@ -1,0 +1,43 @@
+{
+  "title": "The Mediaeval Healer (Revised)",
+  "period": "Mediaeval England, c. 1350",
+  "character": "A village healer woman",
+  "states": [
+    {
+      "id": "intro",
+      "type": "SCENE",
+      "video": "res://data/stories/healer_2/healer_intro_low.ogv",
+      "next_state": "decision_1"
+    },
+    {
+      "id": "decision_1",
+      "type": "DECISION",
+      "background": "res://data/stories/healer_2/decision_background.png",
+      "prompt": "",
+      "options": [
+        { "label": "Garlic?", "label_image": "res://data/stories/healer_2/Garlic_Text.png", "prompt": "Garlic", "image": "res://data/stories/healer_2/Garlic.png" },
+        { "label": "Red Hot Ladle?", "label_image": "res://data/stories/healer_2/Ladle_Text.png", "prompt": "Red Hot Ladle", "image": "res://data/stories/healer_2/Ladle.png" }
+      ],
+      "correct_option": 0,
+      "consequence_state": "decision_1_wrong",
+      "next_state": "decision_1_correct"
+    },
+    {
+      "id": "decision_1_wrong",
+      "type": "CONSEQUENCE",
+      "video": "res://data/stories/healer_2/healer_decision_1_wrong_low.ogv",
+      "rewind_to": "decision_1"
+    },
+    {
+      "id": "decision_1_correct",
+      "type": "SCENE",
+      "video": "res://data/stories/healer_2/healer_decision_1_correct_low.ogv",
+      "next_state": "final"
+    },
+    {
+      "id": "final",
+      "type": "FINAL",
+      "background": "res://data/stories/healer_2/end_screen.png"
+    }
+  ]
+}
